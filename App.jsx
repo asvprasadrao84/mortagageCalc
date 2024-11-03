@@ -1,9 +1,8 @@
-// src/App.jsx
 import React from 'react';
 import Calculator from './components/Calculator';
 import Layout from './components/Layout';
 
-function App() {
+export default function App() {
   const [calculationResults, setCalculationResults] = React.useState(null);
   
   const handleCalculation = (results) => {
@@ -29,4 +28,3 @@ function App() {
   );
 }
 
-export default App;
