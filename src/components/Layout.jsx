@@ -1,7 +1,6 @@
-// src/components/Layout.jsx
 import React from 'react';
 
-export default  function Layout(children) {
+const Layout = ({ children }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation Header */}
@@ -13,16 +12,10 @@ export default  function Layout(children) {
                 <h1 className="text-xl font-bold text-primary">MortgageCalc</h1>
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                <a
-                  href="/"
-                  className="border-primary text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                >
+                <a href="/" className="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium">
                   Calculator
                 </a>
-                <a
-                  href="/blog"
-                  className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                >
+                <a href="/blog" className="text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium">
                   Blog
                 </a>
               </div>
@@ -33,9 +26,7 @@ export default  function Layout(children) {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="children-container">
-          {children}
-        </div>
+        {children} {/* This is where the child components will be rendered */}
       </main>
 
       {/* Footer */}
@@ -48,4 +39,6 @@ export default  function Layout(children) {
       </footer>
     </div>
   );
-}
+};
+
+export default Layout;
