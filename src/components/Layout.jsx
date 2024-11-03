@@ -1,7 +1,7 @@
 // src/components/Layout.jsx
 import React from 'react';
 
-export default  function Layout() {
+export default  function Layout(children) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation Header */}
@@ -34,7 +34,7 @@ export default  function Layout() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="children-container">
-          {/* This is where the calculator and other components will be rendered */}
+          {children}
         </div>
       </main>
 
