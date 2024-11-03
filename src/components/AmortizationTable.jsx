@@ -1,28 +1,55 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-export default function AmortizationTable() {
-  const [selectedLoan, setSelectedLoan] = React.useState(1);
-  const [currentPage, setCurrentPage] = React.useState(1);
+const AmortizationTable = ({ results, currency }) => {
+  const [selectedLoan, setSelectedLoan] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
 
   const formatCurrency = (amount) => {
+    const currencyMap = {
+      '$': 'USD',
+      '€': 'EUR',
+      '₹': 'INR',
+      '¥': 'JPY'
+    };
+
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency: currencyMap[currency],
+      minimumFractionDigits: currency === '¥' ? 0 : 2,
+      maximumFractionDigits: currency === '¥' ? 0 : 2
     }).format(amount);
   };
 
-  // Sample data - replace with actual data from props
-  const schedule = Array.from({ length: 360 }, (_, index) => ({
-    month: index + 1,
-    monthlyPayment: 1500,
-    principalPayment: 500,
-    interestPayment: 1000,
-    remainingPrincipal: 300000 - (500 * (index + 1)),
-    totalInterest: 1000 * (index + 1)
-  }));
+  if (!results || results.length === 0) return null;
 
-  const totalPages = Math.ceil(schedule.length / itemsPerPage);
+  const selectedLoanData = results[selectedLoan];
+  const totalPages = Math.ceil((selectedLoanData.termYears * 12) / itemsPerPage);
+  
+  const generateAmortizationSchedule = () => {
+    const schedule = [];
+    let remainingBalance = selectedLoanData.principalAmount;
+    const monthlyPayment = selectedLoanData.monthlyEMI;
+    const monthlyRate = (selectedLoanData.interestRate / 100) / 12;
+
+    for (let month = 1; month <= selectedLoanData.termYears * 12; month++) {
+      const interestPayment = remainingBalance * monthlyRate;
+      const principalPayment = monthlyPayment - interestPayment;
+      remainingBalance -= principalPayment;
+
+      schedule.push({
+        month,
+        payment: monthlyPayment,
+        principalPayment,
+        interestPayment,
+        remainingBalance: Math.max(0, remainingBalance)
+      });
+    }
+
+    return schedule;
+  };
+
+  const schedule = generateAmortizationSchedule();
   const currentItems = schedule.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -40,12 +67,14 @@ export default function AmortizationTable() {
             onChange={(e) => setSelectedLoan(Number(e.target.value))}
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md"
           >
-            <option value={1}>Loan 1</option>
-            <option value={2}>Loan 2</option>
+            {results.map((_, index) => (
+              <option key={index} value={index}>
+                Loan {index + 1}
+              </option>
+            ))}
           </select>
         </div>
 
-        {/* Table */}
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -63,10 +92,7 @@ export default function AmortizationTable() {
                   Interest
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Remaining Principal
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Total Interest
+                  Remaining Balance
                 </th>
               </tr>
             </thead>
@@ -77,7 +103,7 @@ export default function AmortizationTable() {
                     {row.month}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {formatCurrency(row.monthlyPayment)}
+                    {formatCurrency(row.payment)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {formatCurrency(row.principalPayment)}
@@ -86,10 +112,7 @@ export default function AmortizationTable() {
                     {formatCurrency(row.interestPayment)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {formatCurrency(row.remainingPrincipal)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {formatCurrency(row.totalInterest)}
+                    {formatCurrency(row.remainingBalance)}
                   </td>
                 </tr>
               ))}
@@ -98,7 +121,7 @@ export default function AmortizationTable() {
         </div>
 
         {/* Pagination */}
-        <div className="flex items-center justify-between px-4 py-3 sm:px-6">
+        <div className="mt-4 flex items-center justify-between">
           <div className="flex-1 flex justify-between sm:hidden">
             <button
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
@@ -159,4 +182,6 @@ export default function AmortizationTable() {
       </div>
     </div>
   );
-}
+};
+
+export default AmortizationTable;

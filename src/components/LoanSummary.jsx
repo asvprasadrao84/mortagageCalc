@@ -1,14 +1,27 @@
 import React from 'react';
 
-const LoanSummary = ({ results }) => {
+const LoanSummary = ({ results, currency }) => {
   const formatCurrency = (amount) => {
+    const currencyMap = {
+      '$': 'USD',
+      '€': 'EUR',
+      '₹': 'INR',
+      '¥': 'JPY'
+    };
+
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency: currencyMap[currency],
+      minimumFractionDigits: currency === '¥' ? 0 : 2,
+      maximumFractionDigits: currency === '¥' ? 0 : 2
     }).format(amount);
   };
 
-  if (!results) return null;
+  if (!results || results.length === 0) return null;
+
+  const totalMonthlyPayment = results.reduce((sum, loan) => sum + loan.monthlyEMI, 0);
+  const totalInterest = results.reduce((sum, loan) => sum + loan.totalInterest, 0);
+  const totalAmount = results.reduce((sum, loan) => sum + loan.totalAmount, 0);
 
   return (
     <div className="mt-8 bg-white rounded-lg shadow">
@@ -23,21 +36,15 @@ const LoanSummary = ({ results }) => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <p className="text-sm text-gray-200">Total Monthly Payment</p>
-              <p className="text-2xl font-bold">
-                {formatCurrency(results.reduce((sum, loan) => sum + loan.monthlyEMI, 0))}
-              </p>
+              <p className="text-2xl font-bold">{formatCurrency(totalMonthlyPayment)}</p>
             </div>
             <div>
               <p className="text-sm text-gray-200">Total Interest</p>
-              <p className="text-2xl font-bold">
-                {formatCurrency(results.reduce((sum, loan) => sum + loan.totalInterest, 0))}
-              </p>
+              <p className="text-2xl font-bold">{formatCurrency(totalInterest)}</p>
             </div>
             <div>
               <p className="text-sm text-gray-200">Total Amount</p>
-              <p className="text-2xl font-bold">
-                {formatCurrency(results.reduce((sum, loan) => sum + loan.totalAmount, 0))}
-              </p>
+              <p className="text-2xl font-bold">{formatCurrency(totalAmount)}</p>
             </div>
           </div>
         </div>
@@ -82,9 +89,27 @@ const LoanSummary = ({ results }) => {
                   <div 
                     className="bg-accent h-2.5 rounded-full" 
                     style={{ 
-                      width: `${(loan.periodPrincipalPaid / loan.totalAmount) * 100}%`
+                      width: `${Math.min((loan.periodPrincipalPaid / loan.totalAmount) * 100, 100)}%`
                     }}
                   ></div>
+                </div>
+              </div>
+
+              {/* Additional Details */}
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-500">Principal Amount</p>
+                    <p className="text-lg font-medium text-gray-900">
+                      {formatCurrency(loan.principalAmount)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Total Payment</p>
+                    <p className="text-lg font-medium text-gray-900">
+                      {formatCurrency(loan.totalAmount)}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
