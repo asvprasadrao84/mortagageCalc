@@ -1,7 +1,7 @@
 // src/components/Layout.jsx
 import React from 'react';
 
-export default  function App() {
+export default  function Layout() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation Header */}
