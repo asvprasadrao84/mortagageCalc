@@ -1,4 +1,4 @@
-function App() {
+export default function App() {
   const [currentValue, setCurrentValue] = React.useState('');
   const [inflationRate, setInflationRate] = React.useState('');
   const [years, setYears] = React.useState('');

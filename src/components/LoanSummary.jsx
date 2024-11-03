@@ -1,4 +1,4 @@
-function App() {
+export default function App() {
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',

@@ -1,4 +1,4 @@
-function App() {
+export default function App() {
   const [loans, setLoans] = React.useState([{
     id: 1,
     principalAmount: '',

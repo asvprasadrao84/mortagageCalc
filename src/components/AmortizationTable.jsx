@@ -1,4 +1,4 @@
-function App() {
+export default function App() {
   const [selectedLoan, setSelectedLoan] = React.useState(1);
   const [currentPage, setCurrentPage] = React.useState(1);
   const itemsPerPage = 12;
