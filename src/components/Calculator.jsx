@@ -4,6 +4,7 @@ import LoanSummary from './LoanSummary';
 import AmortizationTable from './AmortizationTable';
 import InvestmentGrowth from './InvestmentGrowth';
 
+
 const Calculator = () => {
   const [loans, setLoans] = useState([{
     id: 1,
