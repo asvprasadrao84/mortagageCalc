@@ -1,3 +1,5 @@
+import React from 'react';
+
 export const exportToCSV = (data, filename) => {
   const headers = [
     'Month',

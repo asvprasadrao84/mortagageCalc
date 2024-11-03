@@ -1,3 +1,5 @@
+import React from 'react';
+
 export const calculateEMI = (principal, annualRate, years) => {
   const monthlyRate = (annualRate / 100) / 12;
   const totalMonths = years * 12;
