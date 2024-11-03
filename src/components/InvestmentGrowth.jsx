@@ -1,4 +1,4 @@
-function App() {
+export default function App() {
   const [formData, setFormData] = React.useState({
     currentValue: '',
     inflationRate: '',
@@ -152,3 +152,5 @@ function App() {
     </div>
   );
 }
+
+export default InvestmentGrowth;
