@@ -1,3 +1,5 @@
+import React from 'react';
+
 export default function AmortizationTable() {
   const [selectedLoan, setSelectedLoan] = React.useState(1);
   const [currentPage, setCurrentPage] = React.useState(1);

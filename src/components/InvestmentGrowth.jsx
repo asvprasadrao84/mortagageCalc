@@ -1,4 +1,3 @@
-     // src/components/InvestmentGrowth.jsx
 import React from 'react';
 
      const InvestmentGrowth = () => {

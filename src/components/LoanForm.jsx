@@ -1,3 +1,5 @@
+import React from 'react';
+
 export default function LoanForm() {
   const [loans, setLoans] = React.useState([{
     id: 1,
