@@ -1,6 +1,6 @@
 import React from 'react';
 
-const LoanSummary = ({ results, currency }) => {
+const LoanSummary = ({ results, currency, calculationPeriod }) => {
   const formatCurrency = (amount) => {
     const currencyMap = {
       '$': 'USD',
@@ -22,6 +22,8 @@ const LoanSummary = ({ results, currency }) => {
   const totalMonthlyPayment = results.reduce((sum, loan) => sum + loan.monthlyEMI, 0);
   const totalInterest = results.reduce((sum, loan) => sum + loan.totalInterest, 0);
   const totalAmount = results.reduce((sum, loan) => sum + loan.totalAmount, 0);
+  const totalPeriodInterest = results.reduce((sum, loan) => sum + loan.periodInterestPaid, 0);
+  const totalPeriodPrincipal = results.reduce((sum, loan) => sum + loan.periodPrincipalPaid, 0);
 
   return (
     <div className="mt-8 bg-white rounded-lg shadow">
@@ -47,6 +49,30 @@ const LoanSummary = ({ results, currency }) => {
               <p className="text-2xl font-bold">{formatCurrency(totalAmount)}</p>
             </div>
           </div>
+
+          {/* Combined Period Totals */}
+          <div className="mt-4 pt-3 border-t border-gray-200/30">
+            <div className="grid grid-cols-3 gap-4 text-xs text-gray-200">
+              <div>
+                <p>Total Interest Paid (in {calculationPeriod} months)</p>
+                <p className="font-semibold mt-1">
+                  {formatCurrency(totalPeriodInterest)}
+                </p>
+              </div>
+              <div>
+                <p>Total Principal Paid (in {calculationPeriod} months)</p>
+                <p className="font-semibold mt-1">
+                  {formatCurrency(totalPeriodPrincipal)}
+                </p>
+              </div>
+              <div>
+                <p>Total Payment Made (in {calculationPeriod} months)</p>
+                <p className="font-semibold mt-1">
+                  {formatCurrency(totalPeriodInterest + totalPeriodPrincipal)}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Individual Loan Cards */}
@@ -54,7 +80,7 @@ const LoanSummary = ({ results, currency }) => {
           {results.map((loan, index) => (
             <div key={loan.id} className="border rounded-lg p-4">
               <h4 className="text-lg font-medium text-gray-900 mb-3">
-                Loan {index + 1}
+                {loan.customName || `Loan ${index + 1}`}
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
@@ -95,19 +121,25 @@ const LoanSummary = ({ results, currency }) => {
                 </div>
               </div>
 
-              {/* Additional Details */}
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Period Totals for Individual Loan */}
+              <div className="mt-4 pt-3 border-t border-gray-100">
+                <div className="grid grid-cols-3 gap-4 text-xs text-orange-500">
                   <div>
-                    <p className="text-sm text-gray-500">Principal Amount</p>
-                    <p className="text-lg font-medium text-gray-900">
-                      {formatCurrency(loan.principalAmount)}
+                    <p>Total Interest Paid (in {calculationPeriod} months)</p>
+                    <p className="font-semibold mt-1">
+                      {formatCurrency(loan.periodInterestPaid)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Total Payment</p>
-                    <p className="text-lg font-medium text-gray-900">
-                      {formatCurrency(loan.totalAmount)}
+                    <p>Total Principal Paid (in {calculationPeriod} months)</p>
+                    <p className="font-semibold mt-1">
+                      {formatCurrency(loan.periodPrincipalPaid)}
+                    </p>
+                  </div>
+                  <div>
+                    <p>Total Payment Made (in {calculationPeriod} months)</p>
+                    <p className="font-semibold mt-1">
+                      {formatCurrency(loan.periodInterestPaid + loan.periodPrincipalPaid)}
                     </p>
                   </div>
                 </div>

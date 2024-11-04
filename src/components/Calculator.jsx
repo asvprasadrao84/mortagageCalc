@@ -121,7 +121,7 @@ const Calculator = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Currency Selector */}
       <div className="mb-6">
-        <label htmlFor="currency" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="currency" className="block text-sm font-medium text-gray-700 px-2">
           Select Currency:
         </label>
         <select
