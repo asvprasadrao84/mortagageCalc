@@ -10,7 +10,8 @@ const Calculator = () => {
     principalAmount: '',
     interestRate: '',
     termYears: '',
-    prepayments: []
+    prepayments: [],
+    customName: '' // Add custom name field
   }]);
   
   const [calculationPeriod, setCalculationPeriod] = useState(12);
@@ -26,14 +27,6 @@ const Calculator = () => {
   };
 
   const handleCalculate = () => {
-    // Validate inputs
-    for (const loan of loans) {
-      if (!loan.principalAmount || !loan.interestRate || !loan.termYears) {
-        alert('Please fill in all required fields for each loan');
-        return;
-      }
-    }
-
     const calculatedResults = loans.map(loan => {
       const emi = calculateEMI(
         Number(loan.principalAmount),
@@ -42,23 +35,28 @@ const Calculator = () => {
       );
       const totalAmount = emi * (loan.termYears * 12);
       const totalInterest = totalAmount - loan.principalAmount;
-      
+
+      // Calculate period totals
+      const periodInterestPaid = (emi * calculationPeriod) - 
+        (calculateEMI(loan.principalAmount, loan.interestRate, loan.termYears) * 
+        (loan.termYears * 12 - calculationPeriod) / (loan.termYears * 12));
+
       return {
         id: loan.id,
         monthlyEMI: emi,
         totalInterest,
         totalAmount,
-        principalAmount: Number(loan.principalAmount),
-        periodPrincipalPaid: (emi * calculationPeriod) - 
-          (calculateEMI(loan.principalAmount, loan.interestRate, loan.termYears) * calculationPeriod * 
-          (loan.termYears * 12 - calculationPeriod) / (loan.termYears * 12))
+        periodInterestPaid: Math.max(0, periodInterestPaid), // Ensure no negative values
+        periodPrincipalPaid: (emi * calculationPeriod) - periodInterestPaid,
+        customName: loan.customName || `Loan ${loan.id}` // Use custom name or default
       };
     });
     
     setResults(calculatedResults);
   };
 
-  const addLoan = () => {
+  // Other functions (addLoan, removeLoan, updateLoan, etc.) remain unchanged
+   const addLoan = () => {
     setLoans([...loans, {
       id: loans.length + 1,
       principalAmount: '',
@@ -117,11 +115,12 @@ const Calculator = () => {
     }));
   };
 
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Currency Selector */}
       <div className="mb-6">
-        <label htmlFor="currency" className="block text-sm font-medium text-gray-700 px-2">
+        <label htmlFor="currency" className="block text-sm font-medium text-gray-700">
           Select Currency:
         </label>
         <select
@@ -153,7 +152,7 @@ const Calculator = () => {
 
       {results && (
         <>
-          <LoanSummary results={results} currency={currency} />
+          <LoanSummary results={results} currency={currency} calculationPeriod={calculationPeriod} />
           <AmortizationTable results={results} currency={currency} />
           <InvestmentGrowth currency={currency} />
         </>

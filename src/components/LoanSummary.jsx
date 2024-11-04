@@ -22,8 +22,8 @@ const LoanSummary = ({ results, currency, calculationPeriod }) => {
   const totalMonthlyPayment = results.reduce((sum, loan) => sum + loan.monthlyEMI, 0);
   const totalInterest = results.reduce((sum, loan) => sum + loan.totalInterest, 0);
   const totalAmount = results.reduce((sum, loan) => sum + loan.totalAmount, 0);
-  const totalPeriodInterest = results.reduce((sum, loan) => sum + loan.periodInterestPaid, 0);
-  const totalPeriodPrincipal = results.reduce((sum, loan) => sum + loan.periodPrincipalPaid, 0);
+  const totalPeriodInterest = results.reduce((sum, loan) => sum + (loan.periodInterestPaid || 0), 0);
+  const totalPeriodPrincipal = results.reduce((sum, loan) => sum + (loan.periodPrincipalPaid || 0), 0);
 
   return (
     <div className="mt-8 bg-white rounded-lg shadow">
@@ -127,19 +127,19 @@ const LoanSummary = ({ results, currency, calculationPeriod }) => {
                   <div>
                     <p>Total Interest Paid (in {calculationPeriod} months)</p>
                     <p className="font-semibold mt-1">
-                      {formatCurrency(loan.periodInterestPaid)}
+                      {formatCurrency(loan.periodInterestPaid || 0)}
                     </p>
                   </div>
                   <div>
                     <p>Total Principal Paid (in {calculationPeriod} months)</p>
                     <p className="font-semibold mt-1">
-                      {formatCurrency(loan.periodPrincipalPaid)}
+                      {formatCurrency(loan.periodPrincipalPaid || 0)}
                     </p>
                   </div>
                   <div>
                     <p>Total Payment Made (in {calculationPeriod} months)</p>
                     <p className="font-semibold mt-1">
-                      {formatCurrency(loan.periodInterestPaid + loan.periodPrincipalPaid)}
+                      {formatCurrency((loan.periodInterestPaid || 0) + (loan.periodPrincipalPaid || 0))}
                     </p>
                   </div>
                 </div>
