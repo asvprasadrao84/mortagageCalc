@@ -67,9 +67,9 @@ const AmortizationTable = ({ results, currency }) => {
             onChange={(e) => setSelectedLoan(Number(e.target.value))}
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md"
           >
-            {results.map((_, index) => (
+            {results.map((loan, index) => (
               <option key={index} value={index}>
-                Loan {index + 1}
+                {loan.customName || `Loan ${index + 1}`}
               </option>
             ))}
           </select>
