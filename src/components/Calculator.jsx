@@ -30,7 +30,7 @@ const Calculator = () => {
     return emi;
   };
 
-  const calculateAmortizationSchedule = (principal, annualRate, years, months) => {
+  const calculateAmortizationSchedule = (principal, annualRate, years, prepayments = [], months) => {
     const monthlyRate = calculateMonthlyRate(annualRate);
     const emi = calculateEMI(principal, annualRate, years);
     let remainingPrincipal = principal;
@@ -39,30 +39,47 @@ const Calculator = () => {
 
     const schedule = [];
     
+    // Sort prepayments by month to ensure they're applied in order
+    const sortedPrepayments = [...prepayments]
+      .filter(p => p.amount && p.month)
+      .sort((a, b) => Number(a.month) - Number(b.month));
+
     for (let month = 1; month <= months; month++) {
       const interestPayment = remainingPrincipal * monthlyRate;
       const principalPayment = emi - interestPayment;
       
+      // Apply any prepayments for this month
+      const prepayment = sortedPrepayments.find(p => Number(p.month) === month);
+      const prepaymentAmount = prepayment ? Number(prepayment.amount) : 0;
+      
+      // Update remaining principal
+      remainingPrincipal = Math.max(0, remainingPrincipal - principalPayment - prepaymentAmount);
+      
+      // Update totals
       totalInterest += interestPayment;
-      totalPrincipal += principalPayment;
-      remainingPrincipal -= principalPayment;
+      totalPrincipal += principalPayment + prepaymentAmount;
 
       schedule.push({
         month,
-        emi,
+        payment: emi,
         interestPayment,
         principalPayment,
-        remainingPrincipal: Math.max(0, remainingPrincipal),
+        prepaymentAmount,
+        remainingPrincipal,
         totalInterest,
         totalPrincipal
       });
+
+      // Break if loan is fully paid
+      if (remainingPrincipal === 0) break;
     }
 
     return {
       schedule,
       totalInterest,
       totalPrincipal,
-      totalPayment: totalInterest + totalPrincipal
+      totalPayment: totalInterest + totalPrincipal,
+      actualTermMonths: schedule.length
     };
   };
 
@@ -85,6 +102,7 @@ const Calculator = () => {
         principal,
         annualRate,
         years,
+        loan.prepayments,
         calculationPeriod
       );
 
@@ -93,6 +111,7 @@ const Calculator = () => {
         principal,
         annualRate,
         years,
+        loan.prepayments,
         years * 12
       );
 

@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { PencilIcon } from '@heroicons/react/24/outline';
 
-
 const LoanForm = ({ 
   loans, 
   onAddLoan, 
   onRemoveLoan, 
-  onUpdateLoan, 
+  onUpdateLoan,
   onAddPrepayment,
   onRemovePrepayment,
   onUpdatePrepayment,
@@ -15,7 +14,7 @@ const LoanForm = ({
   onCalculate,
   currency
 }) => {
-	 const [editingLoanId, setEditingLoanId] = useState(null);
+  const [editingLoanId, setEditingLoanId] = useState(null);
 
   const handleNameEdit = (loanId, newName) => {
     if (newName.trim().length === 0) {
@@ -26,9 +25,9 @@ const LoanForm = ({
     onUpdateLoan(loanId, 'customName', newName.slice(0, 10));
     setEditingLoanId(null);
   };
+
   return (
-   
-<div className="space-y-6">
+    <div className="space-y-6">
       {loans.map((loan, index) => (
         <div key={loan.id} className="bg-white p-6 rounded-lg shadow">
           <div className="flex justify-between items-center mb-4">
@@ -71,6 +70,7 @@ const LoanForm = ({
               </button>
             )}
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">
