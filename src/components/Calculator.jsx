@@ -32,26 +32,26 @@ const Calculator = () => {
 
   const calculateAmortizationSchedule = (principal, annualRate, years, prepayments = [], months) => {
     const monthlyRate = calculateMonthlyRate(annualRate);
-    const emi = calculateEMI(principal, annualRate, years);
     let remainingPrincipal = principal;
     let totalInterest = 0;
     let totalPrincipal = 0;
-
     const schedule = [];
-    
-    // Sort prepayments by month to ensure they're applied in order
+    const totalMonths = years * 12;
+
+    // Sort prepayments by month
     const sortedPrepayments = [...prepayments]
       .filter(p => p.amount && p.month)
       .sort((a, b) => Number(a.month) - Number(b.month));
 
-    for (let month = 1; month <= months; month++) {
+    for (let month = 1; month <= totalMonths; month++) {
       const interestPayment = remainingPrincipal * monthlyRate;
+      const emi = calculateEMI(remainingPrincipal, annualRate, years - ((month - 1) / 12));
       const principalPayment = emi - interestPayment;
-      
+
       // Apply any prepayments for this month
       const prepayment = sortedPrepayments.find(p => Number(p.month) === month);
       const prepaymentAmount = prepayment ? Number(prepayment.amount) : 0;
-      
+
       // Update remaining principal
       remainingPrincipal = Math.max(0, remainingPrincipal - principalPayment - prepaymentAmount);
       

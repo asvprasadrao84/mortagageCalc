@@ -37,11 +37,19 @@ const AmortizationTable = ({ results, currency }) => {
       const principalPayment = monthlyPayment - interestPayment;
       remainingBalance -= principalPayment;
 
+      // Check for prepayment this month
+      const prepayment = selectedLoanData.prepayments.find(p => Number(p.month) === month);
+      const prepaymentAmount = prepayment ? Number(prepayment.amount) : 0;
+
+      // Update remaining balance after prepayment
+      remainingBalance = Math.max(0, remainingBalance - prepaymentAmount);
+
       schedule.push({
         month,
         payment: monthlyPayment,
         principalPayment,
         interestPayment,
+        prepaymentAmount,
         remainingBalance: Math.max(0, remainingBalance)
       });
     }
@@ -92,6 +100,9 @@ const AmortizationTable = ({ results, currency }) => {
                   Interest
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Prepayment
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Remaining Balance
                 </th>
               </tr>
@@ -110,6 +121,9 @@ const AmortizationTable = ({ results, currency }) => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {formatCurrency(row.interestPayment)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {row.prepaymentAmount ? formatCurrency(row.prepaymentAmount) : '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {formatCurrency(row.remainingBalance)}
