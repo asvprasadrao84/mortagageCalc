@@ -11,58 +11,119 @@ const Calculator = () => {
     interestRate: '',
     termYears: '',
     prepayments: [],
-    customName: '' // Add custom name field
+    customName: ''
   }]);
   
   const [calculationPeriod, setCalculationPeriod] = useState(12);
   const [results, setResults] = useState(null);
   const [currency, setCurrency] = useState('$');
 
+  const calculateMonthlyRate = (annualRate) => {
+    return (annualRate / 100) / 12;
+  };
+
   const calculateEMI = (principal, annualRate, years) => {
-    const monthlyRate = (annualRate / 100) / 12;
+    const monthlyRate = calculateMonthlyRate(annualRate);
     const totalMonths = years * 12;
-    const emi = principal * monthlyRate * Math.pow(1 + monthlyRate, totalMonths) / 
-      (Math.pow(1 + monthlyRate, totalMonths) - 1);
+    const emi = (principal * monthlyRate * Math.pow(1 + monthlyRate, totalMonths)) / 
+                (Math.pow(1 + monthlyRate, totalMonths) - 1);
     return emi;
   };
 
-  const handleCalculate = () => {
-    const calculatedResults = loans.map(loan => {
-      const emi = calculateEMI(
-        Number(loan.principalAmount),
-        Number(loan.interestRate),
-        Number(loan.termYears)
-      );
-      const totalAmount = emi * (loan.termYears * 12);
-      const totalInterest = totalAmount - loan.principalAmount;
+  const calculateAmortizationSchedule = (principal, annualRate, years, months) => {
+    const monthlyRate = calculateMonthlyRate(annualRate);
+    const emi = calculateEMI(principal, annualRate, years);
+    let remainingPrincipal = principal;
+    let totalInterest = 0;
+    let totalPrincipal = 0;
 
-      // Calculate period totals
-      const periodInterestPaid = (emi * calculationPeriod) - 
-        (calculateEMI(loan.principalAmount, loan.interestRate, loan.termYears) * 
-        (loan.termYears * 12 - calculationPeriod) / (loan.termYears * 12));
+    const schedule = [];
+    
+    for (let month = 1; month <= months; month++) {
+      const interestPayment = remainingPrincipal * monthlyRate;
+      const principalPayment = emi - interestPayment;
+      
+      totalInterest += interestPayment;
+      totalPrincipal += principalPayment;
+      remainingPrincipal -= principalPayment;
+
+      schedule.push({
+        month,
+        emi,
+        interestPayment,
+        principalPayment,
+        remainingPrincipal: Math.max(0, remainingPrincipal),
+        totalInterest,
+        totalPrincipal
+      });
+    }
+
+    return {
+      schedule,
+      totalInterest,
+      totalPrincipal,
+      totalPayment: totalInterest + totalPrincipal
+    };
+  };
+
+  const handleCalculate = () => {
+    // Validate inputs
+    for (const loan of loans) {
+      if (!loan.principalAmount || !loan.interestRate || !loan.termYears) {
+        alert('Please fill in all required fields for each loan');
+        return;
+      }
+    }
+
+    const calculatedResults = loans.map(loan => {
+      const principal = Number(loan.principalAmount);
+      const annualRate = Number(loan.interestRate);
+      const years = Number(loan.termYears);
+      
+      const emi = calculateEMI(principal, annualRate, years);
+      const amortization = calculateAmortizationSchedule(
+        principal,
+        annualRate,
+        years,
+        calculationPeriod
+      );
+
+      // Calculate full term totals
+      const fullTermAmortization = calculateAmortizationSchedule(
+        principal,
+        annualRate,
+        years,
+        years * 12
+      );
 
       return {
         id: loan.id,
+        customName: loan.customName,
         monthlyEMI: emi,
-        totalInterest,
-        totalAmount,
-        periodInterestPaid: Math.max(0, periodInterestPaid), // Ensure no negative values
-        periodPrincipalPaid: (emi * calculationPeriod) - periodInterestPaid,
-        customName: loan.customName || `Loan ${loan.id}` // Use custom name or default
+        totalInterest: fullTermAmortization.totalInterest,
+        totalAmount: principal + fullTermAmortization.totalInterest,
+        // Period-specific calculations
+        periodInterestPaid: amortization.totalInterest,
+        periodPrincipalPaid: amortization.totalPrincipal,
+        periodTotalPaid: amortization.totalPayment,
+        // Original loan details
+        principalAmount: principal,
+        interestRate: annualRate,
+        termYears: years
       };
     });
     
     setResults(calculatedResults);
   };
 
-  // Other functions (addLoan, removeLoan, updateLoan, etc.) remain unchanged
-   const addLoan = () => {
+  const addLoan = () => {
     setLoans([...loans, {
       id: loans.length + 1,
       principalAmount: '',
       interestRate: '',
       termYears: '',
-      prepayments: []
+      prepayments: [],
+      customName: ''
     }]);
   };
 
@@ -115,7 +176,6 @@ const Calculator = () => {
     }));
   };
 
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Currency Selector */}
@@ -152,9 +212,18 @@ const Calculator = () => {
 
       {results && (
         <>
-          <LoanSummary results={results} currency={currency} calculationPeriod={calculationPeriod} />
-          <AmortizationTable results={results} currency={currency} />
-          <InvestmentGrowth currency={currency} />
+          <LoanSummary 
+            results={results} 
+            currency={currency} 
+            calculationPeriod={calculationPeriod}
+          />
+          <AmortizationTable 
+            results={results} 
+            currency={currency}
+          />
+          <InvestmentGrowth 
+            currency={currency}
+          />
         </>
       )}
     </div>

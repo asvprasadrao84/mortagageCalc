@@ -41,7 +41,7 @@ const LoanSummary = ({ results, currency, calculationPeriod }) => {
               <p className="text-2xl font-bold">{formatCurrency(totalMonthlyPayment)}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-200">Total Interest</p>
+              <p className="text-sm text-gray-200">Total Interest Paid</p>
               <p className="text-2xl font-bold">{formatCurrency(totalInterest)}</p>
             </div>
             <div>
@@ -54,12 +54,12 @@ const LoanSummary = ({ results, currency, calculationPeriod }) => {
           <div className="mt-4 pt-3 border-t border-gray-200/30">
             <div className="grid grid-cols-3 gap-4 text-xs text-gray-200">
               <div>
-                <p>Total Payment Paid (in {calculationPeriod} months)</p>
+                <p>Total Payment Made (in {calculationPeriod} months)</p>
                 <p className="font-semibold mt-1">
                   {formatCurrency(totalPeriodInterest + totalPeriodPrincipal)}
                 </p>
               </div>
-			  <div>
+              <div>
                 <p>Total Interest Paid (in {calculationPeriod} months)</p>
                 <p className="font-semibold mt-1">
                   {formatCurrency(totalPeriodInterest)}
@@ -71,7 +71,6 @@ const LoanSummary = ({ results, currency, calculationPeriod }) => {
                   {formatCurrency(totalPeriodPrincipal)}
                 </p>
               </div>
-              
             </div>
           </div>
         </div>
@@ -104,28 +103,10 @@ const LoanSummary = ({ results, currency, calculationPeriod }) => {
                 </div>
               </div>
 
-              {/* Progress Bar */}
-              <div className="mt-4">
-                <div className="flex justify-between text-sm text-gray-500 mb-1">
-                  <span>Payment Progress</span>
-                  <span>
-                    {((loan.periodPrincipalPaid / loan.totalAmount) * 100).toFixed(1)}%
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2.5">
-                  <div 
-                    className="bg-accent h-2.5 rounded-full" 
-                    style={{ 
-                      width: `${Math.min((loan.periodPrincipalPaid / loan.totalAmount) * 100, 100)}%`
-                    }}
-                  ></div>
-                </div>
-              </div>
-
               {/* Period Totals for Individual Loan */}
               <div className="mt-4 pt-3 border-t border-gray-100">
                 <div className="grid grid-cols-3 gap-4 text-xs text-orange-500">
-				<div>
+                  <div>
                     <p>Total Payment Made (in {calculationPeriod} months)</p>
                     <p className="font-semibold mt-1">
                       {formatCurrency((loan.periodInterestPaid || 0) + (loan.periodPrincipalPaid || 0))}
@@ -143,7 +124,6 @@ const LoanSummary = ({ results, currency, calculationPeriod }) => {
                       {formatCurrency(loan.periodPrincipalPaid || 0)}
                     </p>
                   </div>
-                  
                 </div>
               </div>
             </div>
