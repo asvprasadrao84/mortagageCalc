@@ -10,7 +10,7 @@ const Calculator = () => {
     principalAmount: '',
     interestRate: '',
     termYears: '',
-    prepayments: [],
+    prepayments: [], // Ensure this is initialized
     customName: ''
   }]);
   
@@ -38,14 +38,9 @@ const Calculator = () => {
     const schedule = [];
     const totalMonths = years * 12;
 
-    // Sort prepayments by month
-    /*const sortedPrepayments = [...prepayments]
-      .filter(p => p.amount && p.month)
-      .sort((a, b) => Number(a.month) - Number(b.month));
-	  */
-	 
-	 const sortedPrepayments = Array.isArray(prepayments) ? 
-     prepayments.filter(p => p.amount && p.month).sort((a, b) => Number(a.month) - Number(b.month)) : [];
+    // Defensive check for prepayments
+    const sortedPrepayments = Array.isArray(prepayments) ? 
+      prepayments.filter(p => p.amount && p.month).sort((a, b) => Number(a.month) - Number(b.month)) : [];
 
     for (let month = 1; month <= totalMonths; month++) {
       const interestPayment = remainingPrincipal * monthlyRate;
@@ -58,7 +53,7 @@ const Calculator = () => {
 
       // Update remaining principal
       remainingPrincipal = Math.max(0, remainingPrincipal - principalPayment - prepaymentAmount);
-      
+
       // Update totals
       totalInterest += interestPayment;
       totalPrincipal += principalPayment + prepaymentAmount;
@@ -106,7 +101,7 @@ const Calculator = () => {
         principal,
         annualRate,
         years,
-        loan.prepayments,
+        loan.prepayments || [], // Ensure this is defined
         calculationPeriod
       );
 
@@ -115,7 +110,7 @@ const Calculator = () => {
         principal,
         annualRate,
         years,
-        loan.prepayments,
+        loan.prepayments || [], // Ensure this is defined
         years * 12
       );
 
@@ -145,7 +140,7 @@ const Calculator = () => {
       principalAmount: '',
       interestRate: '',
       termYears: '',
-      prepayments: [],
+      prepayments: [], // Ensure this is initialized
       customName: ''
     }]);
   };
